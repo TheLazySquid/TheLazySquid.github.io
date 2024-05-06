@@ -1,6 +1,8 @@
 <script lang="ts">
     import Highlight from 'svelte-highlight';
     import javascript from 'svelte-highlight/languages/javascript';
+    import diffLang from 'svelte-highlight/languages/diff';
+    import { createTwoFilesPatch } from 'diff';
     import onedark from 'svelte-highlight/styles/onedark';
     import parseHeader from '../lib/parseHeader'
     import { onMount } from 'svelte';
@@ -9,6 +11,8 @@
     const installUrl = searchParams.get('installUrl');
 
     let GLInstallMissing = false;
+    let mode: 'install' | 'update' | 'allSet' = 'install';
+    let diffedScript = '';
 
     onMount(() => {
         GLInstallMissing = (window as any).GLInstall === undefined;
@@ -24,7 +28,27 @@
         const script = await res.text();
         const header = parseHeader(script);
 
-        document.title = `Install ${header.name} - Gimloader`
+        let existing = (window as any).GLGet?.(header.name);
+
+        if(existing) {
+            if(existing === script) {
+                mode = 'allSet';
+                document.title = `${header.name} - Gimloader`
+                return { script, header };
+            }
+
+            mode = 'update';
+            document.title = `Update ${header.name} - Gimloader`
+
+            diffedScript = createTwoFilesPatch(
+                `${header.name} (old)`,
+                `${header.name} (new)`,
+                existing,
+                script
+            );
+        } else {
+            document.title = `Install ${header.name} - Gimloader`
+        }
 
         return { script, header };
     }
@@ -47,7 +71,13 @@
     <div class="p-5 max-h-full" style="max-width: min(90%, max(800px, 50%))">
         <div class="bg-slate-200 drop-shadow-lg rounded-lg p-5 h-full">
             {#if installComplete}
-                <h1 class="w-full text-center font-bold text-5xl">Install Complete</h1>
+                <h1 class="w-full text-center font-bold text-5xl">
+                    {#if mode === 'update'}
+                        Updated Successfully
+                    {:else}
+                        Installed Successfully
+                    {/if}
+                </h1>
                 <p>You may now close this page.</p>
             {:else}
                 {#if installUrl}
@@ -65,16 +95,31 @@
                                 <h2 class="text-3xl w-full text-center">
                                     By {header.author}
                                 </h2>
-                                <p>
+                                <p class="w-full text-center">
                                     {header.description}
                                 </p>
-                                <div class="overflow-y-auto mt-3 rounded-md">
-                                    <Highlight language={javascript} code={script} />
-                                </div>
-                                <button on:click={() => installScript(script)}
-                                class="bg-green-400 rounded-full mt-3 p-1">
-                                    Install
-                                </button>
+                                {#if mode === 'allSet'}
+                                    <div class="border border-black p-3">
+                                        <p class="text-4xl w-full text-center font-bold">This plugin is up to date!</p>
+                                        <p class="text-3xl w-full text-center">You may now close this page.</p>
+                                    </div>
+                                {:else}
+                                    <div class="overflow-y-auto mt-3 rounded-md">
+                                        {#if mode === 'update'}
+                                            <Highlight language={diffLang} code={diffedScript} />
+                                        {:else}
+                                            <Highlight language={javascript} code={script} />
+                                        {/if}
+                                    </div>
+                                    <button on:click={() => installScript(script)}
+                                    class="bg-green-400 rounded-full mt-3 p-1">
+                                        {#if mode === 'update'}
+                                            Update
+                                        {:else}
+                                            Install
+                                        {/if}
+                                    </button>
+                                {/if}
                             </div>
                         {:catch error}
                             <h1 class="text-5xl font-bold w-full text-center">
