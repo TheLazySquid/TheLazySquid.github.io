@@ -1,7 +1,7 @@
 <script lang="ts">
     import '../lib/SpinePlugin.js';
     import { Game, type Types, Scene } from 'phaser';
-    import 'phaser/types/spineplugin.d.ts';
+    import 'phaser/types/SpinePlugin.d.ts';
     import { onMount, onDestroy } from 'svelte';
 
     let texture: any;
@@ -9,8 +9,8 @@
     let gim: any;
 
     $: if(gim) {
-            gim.setAnimation(0, animation, true);
-        }
+        gim.setAnimation(0, animation, true);
+    }
 
     class PreviewScene extends Scene {
         preload() {
