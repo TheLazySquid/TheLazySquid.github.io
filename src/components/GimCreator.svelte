@@ -14,7 +14,7 @@
 
     class PreviewScene extends Scene {
         preload() {
-            this.load.spine('gim', 'baseGim/default_gray.json', 'baseGim/default_gray.atlas')
+            this.load.spine('gim', '/baseGim/default_gray.json', '/baseGim/default_gray.atlas')
         }
 
         create() {
