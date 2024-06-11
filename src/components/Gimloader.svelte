@@ -15,7 +15,9 @@
     let diffedScript = '';
 
     onMount(() => {
-        GLInstallMissing = (window as any).GLInstall === undefined;
+        window.addEventListener("load", () => {
+            GLInstallMissing = (window as any).GLInstall === undefined;
+        })
     })
 
     async function fetchScript() {
