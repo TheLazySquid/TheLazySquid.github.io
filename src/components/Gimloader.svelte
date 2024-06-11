@@ -69,7 +69,7 @@
 
 <div class="flex justify-center max-h-screen">
     <div class="p-5 max-h-full" style="max-width: min(90%, max(800px, 50%))">
-        <div class="bg-slate-200 drop-shadow-lg rounded-lg p-5 h-full">
+        <div class="bg-primary-foreground drop-shadow-lg rounded-lg p-5 h-full">
             {#if installComplete}
                 <h1 class="w-full text-center font-bold text-5xl">
                     {#if mode === 'update'}
@@ -112,7 +112,7 @@
                                         {/if}
                                     </div>
                                     <button on:click={() => installScript(script)}
-                                    class="bg-green-400 rounded-full mt-3 p-1">
+                                    class="bg-green-600 rounded-full mt-3 p-1">
                                         {#if mode === 'update'}
                                             Update
                                         {:else}
