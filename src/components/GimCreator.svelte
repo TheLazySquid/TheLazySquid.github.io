@@ -1,7 +1,7 @@
-<script lang="ts">
-    import '../lib/SpinePlugin.js';
-    import { Game, type Types, Scene } from 'phaser';
-    import 'phaser/types/SpinePlugin.d.ts';
+<script>
+    import '../lib/GimkitIndex.js';
+    import '../lib/Gimkit2dCode.js';
+    import { Game, Scene } from 'phaser';
     import { onMount, onDestroy } from 'svelte';
     import * as Select from "$lib/components/ui/select";
     import * as Resizable from "$lib/components/ui/resizable";
@@ -9,31 +9,34 @@
 
     const animations = [['Running', 'run'], ['Idle', 'idle'], ['Jumping', 'jump']]
 
-    let texture: any;
+    let texture;
     let animation = { value: 'run', label: 'Running' };
-    let gim: any;
-    let mode: string = localStorage.getItem('gimCreatorMode') ?? 'basic';
-    let lastFileUrl: string | null = null;
+    let gim;
+    let mode = localStorage.getItem('gimCreatorMode') ?? 'basic';
+    let lastFileUrl = null;
 
     $: if(gim) {
-        gim.setAnimation(0, animation.value, true);
+        gim.animationState.setAnimation(0, animation.value, true);
     }
 
     class PreviewScene extends Scene {
         preload() {
-            this.load.spine('gim', '/baseGim/default_gray.json', '/baseGim/default_gray.atlas')
+            this.load.spineJson('gim-data', '/baseGim/default_gray.json');
+            this.load.spineAtlas('gim-atlas', '/baseGim/default_gray.atlas');
         }
 
         create() {
-            gim = this.add.spine(400, 730, 'gim', animation.value, true)
+            gim = this.add.spine(400, 730, "gim-data", "gim-atlas");
             gim.setScale(2.5);
-            gim.setSkinByName('default_gray');
+            gim.skeleton.setSkinByName('default_gray');
+            gim.animationState.setAnimation(0, "run", true);
 
-            texture = gim.plugin.spineTextures.entries.entries['gim'].pages[0].texture
+            let entries = this.cache.custom["esotericsoftware.spine.atlas.cache"].entries.entries;
+            texture = entries["gim-atlas"].pages[0].texture;
         }
     }
 
-    function updateSkin(file: Blob) {
+    function updateSkin(file) {
         if(!texture) return;
 
         if(lastFileUrl) URL.revokeObjectURL(lastFileUrl);
@@ -46,18 +49,19 @@
         }, { once: true })        
     }
 
-    let canvasParent: HTMLDivElement;
-
-    let game: Game;
+    let canvasParent;
+    let game;
     
+    let spine = parcelRequire388b("38yEz");
+
     onMount(() => {
-        const config: Types.Core.GameConfig = {
+        const config = {
             type: Phaser.AUTO,
             scene: PreviewScene,
             plugins: {
                 scene: [
                     // @ts-ignore
-                    { key: 'SpinePlugin', plugin: window.SpinePlugin, mapping: 'spine' }
+                    { key: 'SpinePlugin', plugin: spine.SpinePlugin, mapping: 'spine' }
                 ]
             },
             width: 800,
@@ -75,7 +79,7 @@
         game.destroy(true);
     })
 
-    let fileHandle: FileSystemFileHandle;
+    let fileHandle;
     let supportsFsApi = 'showOpenFilePicker' in window;
 
     async function openFilePicker() {
@@ -94,14 +98,14 @@
         input.type = 'file';
 
         input.onchange = (e) => {
-            let file = (e.target as HTMLInputElement).files?.[0];
+            let file = e.target.files?.[0];
             if(file) updateSkin(file);
         }
 
         input.click();
     }
 
-    function onDrop(e: DragEvent) {
+    function onDrop(e) {
         e.preventDefault();
         let file = e.dataTransfer?.files?.[0];
 
@@ -114,9 +118,9 @@
         fileHandle.getFile().then(updateSkin);
     }
 
-    let userImage: File | null = null;
+    let userImage = null;
 
-    function onBasicDrop(e: DragEvent) {
+    function onBasicDrop(e) {
         e.preventDefault();
         let file = e.dataTransfer?.files?.[0];
 
@@ -128,22 +132,22 @@
         input.type = 'file';
 
         input.onchange = (e) => {
-            let file = (e.target as HTMLInputElement).files?.[0];
+            let file = e.target.files?.[0];
             if(file) userImage = file;
         }
 
         input.click();
     }
 
-    function onBasicSubmit(e: CustomEvent<HTMLCanvasElement>) {
+    function onBasicSubmit(e) {
         let canvas = e.detail;
         canvas.toBlob((blob) => {
-            updateSkin(blob!);
+            updateSkin(blob);
         }, 'image/png');
         userImage = null;
     }
 
-    function setMode(newMode: string) {
+    function setMode(newMode) {
         localStorage.setItem('gimCreatorMode', newMode);
         mode = newMode;
     }

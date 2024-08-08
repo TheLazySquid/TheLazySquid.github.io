@@ -116,8 +116,8 @@
 
     function createOutput() {
         let outputCanvas = document.createElement('canvas');
-        outputCanvas.width = 512;
-        outputCanvas.height = 1152;
+        outputCanvas.width = 1024;
+        outputCanvas.height = 832;
         let outputCtx = outputCanvas.getContext('2d')!;
 
         // draw the user image to the temp canvas
@@ -128,28 +128,25 @@
         tempCtx.drawImage(userImg, userImageOffset.x, userImageOffset.y, userImg.width * userImageScale, userImg.height * userImageScale);
 
         // copy the body onto the spritesheet
-        outputCtx.save();
-        outputCtx.rotate(-Math.PI / 2);
-        outputCtx.drawImage(tempCanvas, -963, 64);
+        outputCtx.drawImage(tempCanvas, 70, 263);
 
         tempCtx.globalCompositeOperation = "copy";
         tempCtx.drawImage(images.leftLegMask, (500 - 212) / 2, (500 - 194) / 2, 212, 194);
         tempCtx.globalCompositeOperation = "source-in";
         tempCtx.drawImage(userImg, userImageOffset.x, userImageOffset.y, userImg.width * userImageScale, userImg.height * userImageScale);
 
-        outputCtx.drawImage(tempCanvas, -771, -60);
-        outputCtx.restore();
+        outputCtx.drawImage(tempCanvas, 53, 70);
 
         tempCtx.globalCompositeOperation = "copy";
         tempCtx.drawImage(images.rightLegMask, (500 - 212) / 2, (500 - 194) / 2, 212, 194);
         tempCtx.globalCompositeOperation = "source-in";
         tempCtx.drawImage(userImg, userImageOffset.x, userImageOffset.y, userImg.width * userImageScale, userImg.height * userImageScale);
 
-        outputCtx.drawImage(tempCanvas, 24, 270);
+        outputCtx.drawImage(tempCanvas, 395, 231);
         outputCtx.drawImage(images.blankSpritesheet, 0, 0);
         
         if(!includeEyes) {
-            outputCtx.clearRect(0, 1020, 182, 132);
+            outputCtx.clearRect(0, 0, 1024, 63);
         }
 
         ctx.clearRect(0, 0, 500, 500);
