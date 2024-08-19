@@ -90,10 +90,17 @@
                         done = true;
 
                         const batHandle = await dirHandle.getFileHandle("render.bat", { create: true });
-                        const writable = await batHandle.createWritable();
-                        await writable.write(`gifski --fps 60 -o ${gimIdTitleCase}Running.gif run/*.png\n` + 
+                        const batWritable = await batHandle.createWritable();
+                        await batWritable.write(`gifski --fps 60 -o ${gimIdTitleCase}Running.gif run/*.png\n` + 
                             `gifski --fps 60 -o ${gimIdTitleCase}Jumping.gif jump/*.png`);
-                        await writable.close();
+                        await batWritable.close();
+
+                        const shHandle = await dirHandle.getFileHandle("render.sh", { create: true });
+                        const shWritable = await shHandle.createWritable();
+                        await shWritable.write("#!/bin/bash\n" +
+                            `gifski --fps 60 -o ${gimIdTitleCase}Running.gif run/*.png\n` + 
+                            `gifski --fps 60 -o ${gimIdTitleCase}Jumping.gif jump/*.png`);
+                        await shWritable.close();
 
                         return;
                     }
@@ -147,9 +154,9 @@
     <AlertDialog.Content>
         <AlertDialog.Title>Rendering Complete</AlertDialog.Title>
         <AlertDialog.Description>
-            You can now combine the frames into a gif using any tool of your choosing. I recommend
-            <a href="https://gif.ski/" class="text-white underline">Gifski</a>. If you are using windows, you can use the
-            provided batch file.
+            You can now combine the frames into a gif using any tool of your choosing. If you have
+            <a href="https://gif.ski/" class="text-white underline">Gifski</a> installed, you can use one of the
+            provided scripts to do it automatically.
             <br>
             This is a tool created for the 
             <a href="https://gimkit.wiki" class="underline text-white">Miraheze Gimkit Wiki</a>. Please do not

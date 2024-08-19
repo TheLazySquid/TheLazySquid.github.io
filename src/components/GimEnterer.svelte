@@ -9,11 +9,14 @@
     import { fade } from 'svelte/transition';
     import { makeCorsUrl } from '../util/net';
 
+    let params = new URLSearchParams(window.location.search);
+    let idSupplied = params.has("id");
+
     let supportsFsApi = 'showDirectoryPicker' in window;
-    let gimId: string;
+    let gimId: string = params.get("id") || "";
     let loading = false;
     let failedOpen = false;
-    let selectDirOpen = false;
+    let selectDirOpen = supportsFsApi && idSupplied;
 
     function verify() {
         if(!gimId) return;
