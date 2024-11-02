@@ -193,13 +193,13 @@
             <ol class="w-full p-2 [&>li]:mb-2 [&>li]:mt-2">
                 {#if mode === 'normal'}
                     <li>1. Download the base gim texture
-                        <a href="/baseGim/default_gray-v2.21.png" download
+                        <a href="/baseGim/default_gray-v2.17.png" download
                         class="underline text-blue-600">
-                            here
+                            here.
                         </a>
                     </li>
                     <li>2. Open up the file in the image editor of your choice. I recommend
-                        <a class="underline" href="https://www.gimp.org/">Gimp</a>.
+                        <a class="underline" href="https://www.gimp.org/" target="_blank">Gimp</a>.
                     </li>
                     <li>
                         3. Make whatever edits you want! To preview the Gim, export/overwrite the image and drag and drop it here.
