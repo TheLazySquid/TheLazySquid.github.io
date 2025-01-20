@@ -15,7 +15,7 @@
 
     class RenderScene extends Scene {
         preload() {
-            this.load.baseURL = "https://corsproxy.io/?https://www.gimkit.com/assets/map/characters/spine/"
+            this.load.baseURL = "https://corsproxy.io/?url=https://www.gimkit.com/assets/map/characters/spine/"
             let json = this.load.spineJson('gim-data', `${gimId}.json`);
             let atlas = this.load.spineAtlas('gim-atlas', `${gimId}.atlas`);
 
