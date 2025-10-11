@@ -9,8 +9,10 @@
     const red = "#ff0713";
     
     const rng = new PRNG(shelf.toString());
+    let seedKey = $state(0);
     watch(() => shelf, () => {
         rng.setSeed(shelf.toString());
+        seedKey++;
     }, { lazy: true });
 
     function openBook(row: number, book: number) {
@@ -36,7 +38,7 @@
                 {@const special = shelf === 1n && row === halfwayRow && book === halfwayBook}
                 <button onclick={() => openBook(row, book)}
                     onpointerover={() => hoverBook(row, book)}>
-                    {#key shelf}
+                    {#key seedKey}
                         <img src="/books/{special ? 2 : rng.randomRange(1, 7)}.svg" alt="Book"
                             class="w-[30px] mask-no-repeat" 
                             style:mask-size="100% 100%"
