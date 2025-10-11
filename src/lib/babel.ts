@@ -1,4 +1,4 @@
-import { booksPerRow, pagesPerBook, rowsPerShelf } from "./consts";
+import { booksPerRow, shelfOffset, pagesPerBook, rowsPerShelf } from "./consts";
 import PRNG from "./rng";
 import { mod, stringToCodes } from "./util";
 
@@ -7,10 +7,9 @@ const rng = new PRNG();
 
 // 99 characters total (so there's no issues with leading 00)
 const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ  `1234567890-=[]\\;'./~!@#$%^&*()_+{}|:\"<>?\n,.?";
-const charsPerPage = 3200;
+const charsPerPage = 1350;
 
 export function searchText(string: string) {
-    string = string.padEnd(charsPerPage);
     rng.setSeed(...stringToCodes(string));
     let row = rng.random(rowsPerShelf);
     let book = rng.random(booksPerRow);
@@ -29,6 +28,9 @@ export function searchText(string: string) {
 }
 
 export function getPage(shelf: string, row: number, book: number, page: number) {
+    let shelfInt = BigInt(shelf) + shelfOffset;
+    shelf = shelfInt.toString();
+
     // Add back leading zeroes in case they got dropped
     if(shelf.length % 2 !== 0) shelf = "0" + shelf;
 

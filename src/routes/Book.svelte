@@ -1,41 +1,64 @@
 <script lang="ts">
     import { getPage } from "$lib/babel";
     import { pagesPerBook } from "$lib/consts";
-    import { state } from "./state.svelte";
+    import { viewState } from "./state.svelte";
     import Markdown from "svelte-exmarkdown";
     import ChevronLeft from "@lucide/svelte/icons/chevron-left";
     import ChevronRight from "@lucide/svelte/icons/chevron-right";
+    import { watch } from "runed";
 
     function onKeydown(e: KeyboardEvent) {
         if (e.key === "Escape") {
-            state.open = false;
+            viewState.open = false;
         }
     }
 
     function onPointerdown(e: PointerEvent) {
         if((e.target as HTMLElement).id === "bookbg") {
-            state.open = false;
+            viewState.open = false;
+        }
+    }
+
+    let pageVal: string | number = $state(viewState.page + 1);
+    watch(() => viewState.page, () => {
+        pageVal = viewState.page + 1;
+    });
+
+    function movePage(delta: number) {
+        viewState.page += delta;
+    }
+
+    function onPageChange() {
+        let page = parseInt(pageVal as string);
+        if(isNaN(page)) {
+            pageVal = viewState.page + 1;
+        } else {
+            page = Math.min(Math.max(page, 1), pagesPerBook) - 1;
+            viewState.page = page;
         }
     }
 </script>
 
 <svelte:window onkeydown={onKeydown} />
 
-{#if state.open}
-    <div class="fixed top-0 left-0 w-screen h-screen bg-black flex flex-col gap-10 items-center justify-center z-20"
-        style="background-color: rgba(0, 0, 0, 0.8)" id="bookbg" onpointerdown={onPointerdown}>
-        <div style="background-color: {state.color}; width: min(90%, 1200px);"
-            class="h-[85%] rounded-4xl p-3 overflow-auto markdown">
-            <Markdown md={getPage(state.shelf.toString(), state.row, state.book, state.page)} />
+{#if viewState.open && viewState.row !== null && viewState.book !== null}
+    <div class="fixed top-0 left-0 w-screen h-screen bg-backdrop flex flex-col gap-10 items-center justify-center z-20"
+        id="bookbg" onpointerdown={onPointerdown}>
+        <div style="width: min(90%, 600px);"
+            class="h-[85%] bg-amber-100 rounded-4xl p-3 overflow-hidden markdown break-words">
+            <Markdown md={getPage(viewState.shelf.toString(), viewState.row, viewState.book, viewState.page)} />
         </div>
         <div class="text-white text-2xl select-none font-semibold flex items-center gap-5">
-            <button disabled={state.page === 0} class:opacity-50={state.page === 0}
-                onclick={() => state.page--}>
+            <button disabled={viewState.page === 0} class:opacity-50={viewState.page === 0}
+                onclick={() => movePage(-1)}>
                 <ChevronLeft />
             </button>
-            {state.page + 1 } / {pagesPerBook}
-            <button disabled={state.page === pagesPerBook - 1} class:opacity-50={state.page === pagesPerBook - 1}
-                onclick={() => state.page++}>
+            <input type="text" class="w-[50px] border-b border-white outline-none"
+                pattern="[0-9]*" maxlength="3"
+                bind:value={pageVal} onchange={onPageChange} />
+            / {pagesPerBook}
+            <button disabled={viewState.page === pagesPerBook - 1} class:opacity-50={viewState.page === pagesPerBook - 1}
+                onclick={() => movePage(1)}>
                 <ChevronRight />
             </button>
         </div>
