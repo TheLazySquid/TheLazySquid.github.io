@@ -10,3 +10,8 @@ export function modBigInt(number: bigint, modulus: number) {
 export function stringToCodes(string: string) {
     return string.split("").map(c => c.charCodeAt(0));
 }
+
+export function formatShelf(shelf: string) {
+    if(shelf.length <= 6) return shelf;
+    return shelf.slice(0, 3) + "..." + shelf.slice(-3);
+}

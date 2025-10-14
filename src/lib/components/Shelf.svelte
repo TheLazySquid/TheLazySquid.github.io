@@ -2,7 +2,7 @@
     import { booksPerRow, rowsPerShelf } from "$lib/consts";
     import PRNG from "$lib/rng";
     import { watch } from "runed";
-    import { viewState } from "./state.svelte";
+    import { viewState } from "$lib/state.svelte";
 
     let { shelf }: { shelf: bigint } = $props();
     const colors = ["#f87171", "#34d399", "#60a5fa", "#fbbf24", "#a78bfa", "#f472b6", "#f97316"];
@@ -15,7 +15,8 @@
         seedKey++;
     }, { lazy: true });
 
-    function openBook(row: number, book: number) {
+    function openBook(e: MouseEvent, row: number, book: number) {
+        e.stopPropagation();
         viewState.row = row;
         viewState.book = book;
         viewState.page = 0;
@@ -36,7 +37,7 @@
         <div class="flex border-amber-700 border-b-8 pt-3 items-end">
             {#each { length: booksPerRow }, book}
                 {@const special = shelf === 1n && row === halfwayRow && book === halfwayBook}
-                <button onclick={() => openBook(row, book)}
+                <button onclick={(e) => openBook(e, row, book)}
                     onpointerover={() => hoverBook(row, book)}>
                     {#key seedKey}
                         <img src="/books/{special ? 2 : rng.randomRange(1, 7)}.svg" alt="Book"

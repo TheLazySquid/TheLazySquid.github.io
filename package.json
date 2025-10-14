@@ -27,6 +27,7 @@
 		"@lucide/svelte": "^0.545.0",
 		"isaac-prng": "^1.0.16",
 		"runed": "^0.34.0",
-		"svelte-exmarkdown": "^5.0.2"
+		"svelte-exmarkdown": "^5.0.2",
+		"svelte-french-toast": "^1.2.0"
 	}
 }

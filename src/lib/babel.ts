@@ -1,19 +1,31 @@
-import { booksPerRow, shelfOffset, pagesPerBook, rowsPerShelf } from "./consts";
+import { booksPerRow, shelfOffset, pagesPerBook, rowsPerShelf, charsPerPage, chars } from "./consts";
 import PRNG from "./rng";
 import { mod, stringToCodes } from "./util";
 
 // Algorithm inspired by https://github.com/cakenggt/Library-Of-Pybel
 const rng = new PRNG();
 
-// 99 characters total (so there's no issues with leading 00)
-const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ  `1234567890-=[]\\;'./~!@#$%^&*()_+{}|:\"<>?\n,.?";
-const charsPerPage = 1350;
+export function genGarbage(length: number) {
+    let result = "";
+    for(let i = 0; i < length; i++) {
+        let index = Math.floor(Math.random() * chars.length);
+        result += chars[index];
+    }
+    return result;
+}
 
-export function searchText(string: string) {
+export interface Address {
+    shelf: string;
+    row: number;
+    book: number;
+    page: number;
+}
+
+export function searchStart(string: string, row?: number, book?: number, page?: number): Address {
     rng.setSeed(...stringToCodes(string));
-    let row = rng.random(rowsPerShelf);
-    let book = rng.random(booksPerRow);
-    let page = rng.random(pagesPerBook);
+    row ??= rng.random(rowsPerShelf);
+    book ??= rng.random(booksPerRow);
+    page ??= rng.random(pagesPerBook);
     rng.setSeed(row, book, page);
 
     let shelf = "";
@@ -27,9 +39,29 @@ export function searchText(string: string) {
     return { shelf, row, book, page };
 }
 
+export function search(string: string) {
+    const padded = string.padEnd(charsPerPage, " ");
+    const exactAddress = searchStart(padded);
+    
+    // Get an address somewhere in the middle of the page
+    const maxGarbage = charsPerPage - string.length;
+    rng.setSeed(...stringToCodes(string));
+    const garbageAmount = rng.random(maxGarbage);
+    const garbage = genGarbage(garbageAmount);
+    const middleAddress = searchStart(garbage + string);
+
+    return {
+        exactAddress,
+        middleAddress
+    }
+}
+
 export function getPage(shelf: string, row: number, book: number, page: number) {
-    let shelfInt = BigInt(shelf) + shelfOffset;
-    shelf = shelfInt.toString();
+    // This is kind of cheating to get the special book onto the first shelf
+    if(shelf === "1" || shelf === "01") {
+        let shelfInt = BigInt(shelf) + shelfOffset;
+        shelf = shelfInt.toString();
+    }
 
     // Add back leading zeroes in case they got dropped
     if(shelf.length % 2 !== 0) shelf = "0" + shelf;

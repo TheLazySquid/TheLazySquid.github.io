@@ -1,62 +1,23 @@
 <script lang="ts">
-    import Shelf from "./Shelf.svelte";
+    import Shelf from "$lib/components/Shelf.svelte";
     import ChevronRight from "@lucide/svelte/icons/chevron-right";
     import ChevronLeft from "@lucide/svelte/icons/chevron-left";
     import Pencil from "@lucide/svelte/icons/pencil";
-    import { viewState } from "./state.svelte";
-    import Book from "./Book.svelte";
-    import { watch } from "runed";
+    import Search from "@lucide/svelte/icons/search";
+    import { viewState } from "../lib/state.svelte";
+    import Book from "../lib/components/Book.svelte";
     import { Tween } from "svelte/motion";
     import { onMount } from "svelte";
     import { cubicInOut } from "svelte/easing";
+    import GrowingTextarea from "$lib/components/GrowingTextarea.svelte";
+    import SearchResults from "$lib/components/SearchResults.svelte";
+    import { formatShelf } from "$lib/util";
+    import { charsPerPage, charsRegex } from "$lib/consts";
+    import toast from "svelte-french-toast";
 
     let editingShelf = $state(false);
-    let shelfVal = $state(viewState.shelf.toString());
-    watch(() => viewState.shelf, () => {
-        shelfVal = viewState.shelf.toString();
-    });
-
-    const shelfPadding = 180;
-    const characterWidth = 13.2;
-    const lineHeight = 32;
+    let searching = $state(false);
     let windowWidth = $state(0);
-    let maxWidth = $derived(windowWidth - shelfPadding);
-    let shelfWidth = $derived(Math.min((shelfVal.length + 5) * characterWidth, maxWidth));
-    let shelfHeight = $derived(Math.ceil((shelfVal.length + 5) * characterWidth / maxWidth) * lineHeight);
-
-    function formatShelf(shelf: bigint) {
-        let string = shelf.toString();
-        if(string.length <= 6) return string;
-        return string.slice(0, 3) + "..." + string.slice(-3);
-    }
-
-    function onShelfChange() {
-        try {
-            let shelf = BigInt(shelfVal);
-            if(shelf < 1n) shelf = 1n;
-            viewState.shelf = shelf;
-            recenter();
-        } catch {}
-    }
-
-    const numberRegex = /[0-9]/;
-    function onShelfInput(e: KeyboardEvent) {
-        if(e.key.length === 1 && !e.altKey && !e.ctrlKey && !e.metaKey && !numberRegex.test(e.key)) {
-            e.preventDefault();
-        } else if(e.key === "Enter") {
-            e.preventDefault();
-            onShelfChange();
-            editingShelf = false;
-        } else if(e.key === "Escape") {
-            e.preventDefault();
-            shelfVal = viewState.shelf.toString();
-            editingShelf = false;
-        }
-    }
-
-    function autofocus(node: HTMLElement) {
-        node.focus();
-    }
 
     const tweenDuration = 300;
     let shelfOffset = new Tween(0, { duration: tweenDuration, easing: cubicInOut });
@@ -92,6 +53,37 @@
             moveTimeout = null;
         }, tweenDuration);
     }
+    
+    function onShelfChange(value: string) {
+        try {
+            let valInt = BigInt(value);
+            if(valInt < 1n) valInt = 1n;
+            viewState.shelf = valInt;
+            viewState.open = false;
+            recenter();
+        } catch {}
+
+        editingShelf = false;
+    }
+
+    let resultsOpen = $state(false);
+    let query = $state("");
+    function onSearch(value: string) {
+        searching = false;
+
+        console.log(value);
+        if(!value) return;
+        value = value.replace(charsRegex, "");
+        console.log(value);
+        
+        if(!value) {
+            toast.error("Search is empty after removing illegal characters");
+            return;
+        }
+
+        query = value;
+        resultsOpen = true;
+    }
 </script>
 
 <svelte:window bind:innerWidth={windowWidth} onresize={recenter} />
@@ -101,11 +93,10 @@
         <div class="flex items-center gap-4 w-full">
             Shelf:
             {#if editingShelf}
-                <textarea class="resize-none grow h-8 p-0 outline-none -ml-[3px]" bind:value={shelfVal}
-                    style="width: {shelfWidth}px; height: {shelfHeight}px;" use:autofocus
-                    onchange={onShelfChange} onkeydown={onShelfInput} onblur={() => editingShelf = false}></textarea>
+                <GrowingTextarea number={true} padding={175} maxlength={charsPerPage * 2}
+                    value={viewState.shelf.toString()} onChange={onShelfChange}  />
             {:else}
-                {formatShelf(viewState.shelf)}
+                {formatShelf(viewState.shelf.toString())}
             {/if}
             <button onclick={() => editingShelf = true}>
                 <Pencil size={20} />
@@ -117,12 +108,23 @@
         {#if viewState.book !== null}
             <div>Book: {viewState.book + 1}</div>
         {/if}
+        <div class="flex items-center gap-4">
+            Search
+            {#if searching}
+                <GrowingTextarea value="" padding={175} maxlength={charsPerPage}
+                    onChange={onSearch} placeholder="..." />
+            {/if}
+            <button onclick={() => searching = true}>
+                <Search size={20} />
+            </button>
+        </div>
     </div>
 </div>
 
 <Book />
+<SearchResults {query} bind:open={resultsOpen} />
 
-{#snippet button(className: string, Icon: typeof ChevronRight, delta: bigint)}
+{#snippet button(className: string, Icon: typeof ChevronLeft, delta: bigint)}
     <button class="{className} fixed top-1/2 -translate-y-1/2 rounded-full flex justify-center items-center z-10"
         style="background-color: rgba(255, 255, 255, 0.7)" onclick={() => moveShelf(delta)}>
         <Icon size={32} />
