@@ -88,11 +88,13 @@ export function drawShelf(ctx: CanvasRenderingContext2D, shelf: bigint) {
     // Draw the books
     for(let i = 0; i < rowsPerShelf; i++) {
         for(let j = 0; j < booksPerRow; j++) {
-            const height = rng.randomRange(140, 160);
+            let special = shelf === 1n && i === 2 && j === 23;
+
+            const height = special ? 100 : rng.randomRange(140, 160);
             const x = shelfThickness / 2 + j * bookWidth;
             const y = -shelfThickness / 2 + i * rowHeight + rowHeight - height;
 
-            drawBook(ctx, x, y, height);
+            drawBook(ctx, x, y, height, special);
         }
     }
 
@@ -120,12 +122,11 @@ export function drawShelf(ctx: CanvasRenderingContext2D, shelf: bigint) {
     // ctx.fillText(shelf.toString(), 10, 40);
 }
 
-function drawBook(ctx: CanvasRenderingContext2D, x: number, y: number, height: number) {
+function drawBook(ctx: CanvasRenderingContext2D, x: number, y: number, height: number, special: boolean) {
     const color = bookColors[rng.random(bookColors.length)];
-
     const type = rng.randomRange(1, 7);
 
-    ctx.fillStyle = color;
+    ctx.fillStyle = special ? red : color;
     ctx.strokeStyle = "black";
     ctx.lineWidth = 3;
 
@@ -171,7 +172,7 @@ function drawBook(ctx: CanvasRenderingContext2D, x: number, y: number, height: n
         ctx.beginPath();
         ctx.ellipse(x + bookWidth / 2, y + height / 2, bookWidth / 2 - 6, 25, 0, 0, Math.PI * 2);
         ctx.stroke();
-    } else {
+    } else if(type === 7) {
         // Ellipse with line on top and bottom
         ctx.beginPath();
         ctx.ellipse(x + bookWidth / 2, y + height / 2, bookWidth / 2 - 6, 25, 0, 0, Math.PI * 2);

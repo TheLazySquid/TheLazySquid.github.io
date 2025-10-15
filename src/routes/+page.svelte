@@ -44,8 +44,6 @@
         query = value;
         resultsOpen = true;
     }
-
-    $inspect(viewState.open).with(console.trace);
 </script>
 
 <svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight} />
