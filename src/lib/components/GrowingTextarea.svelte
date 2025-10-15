@@ -6,11 +6,12 @@
         number?: boolean;
         placeholder?: string;
         value: string;
+        onCancel?: () => void;
         onChange: (value: string) => void;
         maxlength?: number;
     }
 
-    let { padding, number, placeholder, value, onChange, maxlength }: Props = $props();
+    let { padding, number, placeholder, value, onCancel, onChange, maxlength }: Props = $props();
     
     const numberRegex = /[0-9]/;
     const characterWidth = 13.2;
@@ -47,8 +48,12 @@
             onValueChange();
         } else if(e.key === "Escape") {
             e.preventDefault();
-            onValueChange();
+            tryCancel();
         }
+    }
+    
+    function tryCancel() {
+        onCancel ? onCancel() : onValueChange();
     }
 
     let textarea: HTMLTextAreaElement;
@@ -64,4 +69,4 @@
 <textarea class="resize-none outline-none -mx-[3px] wrap-break-word h-8 overflow-hidden
     {number ? "" : "border-b border-yellow-200 -my-px"}" use:autofocus spellcheck={false}
     style:width="{width}px" bind:value={value} {placeholder} bind:this={textarea} {maxlength}
-    onchange={onValueChange} onkeydown={onKeydown} oninput={updateHeight} onblur={onValueChange}></textarea>
+    onkeydown={onKeydown} oninput={updateHeight} onblur={tryCancel}></textarea>

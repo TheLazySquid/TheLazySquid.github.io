@@ -15,12 +15,6 @@
         }
     }
 
-    function onPointerdown(e: PointerEvent) {
-        if((e.target as HTMLElement).id === "bookbg") {
-            viewState.open = false;
-        }
-    }
-
     let pageVal: string | number = $state(viewState.page + 1);
     watch(() => viewState.page, () => {
         pageVal = viewState.page + 1;
