@@ -41,7 +41,7 @@
 <svelte:window onkeydown={onKeydown} />
 
 <Modal class="bg-backdrop" bind:open={viewState.open}>
-    <div style="width: min(90%, 600px);" class="flex-grow min-h-0 bg-amber-100 rounded-4xl p-3">
+    <div style="width: min(90%, 600px);" class="flex-grow min-h-0 bg-amber-100 rounded-4xl p-3 max-h-[800px]">
         <div class="markdown break-words overflow-auto h-full"
             style="scrollbar-color: rgba(0, 0, 0, 0.5) transparent;">
             <Markdown md={getPage(viewState.shelf.toString(), viewState.row, viewState.book, viewState.page)}
