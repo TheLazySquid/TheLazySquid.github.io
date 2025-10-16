@@ -48,12 +48,12 @@
 
 <svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight} />
 
-<div class="fixed top-0 left-0 p-3 z-30">
+<div class="fixed top-0 left-0 p-3 z-10 sm:z-30">
     <div class="text-yellow-200 bg-backdrop rounded-xl p-2 text-2xl/8 font-mono">
         <div class="flex items-center gap-4 w-full">
             Shelf:
             {#if editingShelf}
-                <GrowingTextarea number={true} padding={175} maxlength={charsPerPage * 2}
+                <GrowingTextarea number={true} padding={175}
                     value={viewState.shelf.toString()} onChange={onShelfChange} />
             {:else}
                 {formatShelf(viewState.shelf.toString())}

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { charsRegex } from "$lib/consts";
     import { onMount } from "svelte";
     
     interface Props {
@@ -13,7 +14,7 @@
 
     let { padding, number, placeholder, value, onCancel, onChange, maxlength }: Props = $props();
     
-    const numberRegex = /[0-9]/;
+    const numberRegex = /[^0-9]/;
     const characterWidth = 13.2;
 
     let windowWidth = $state(0);
@@ -40,9 +41,7 @@
     }
 
     function onKeydown(e: KeyboardEvent) {
-        if(number && e.key.length === 1 && !e.altKey && !e.ctrlKey && !e.metaKey && !numberRegex.test(e.key)) {
-            e.preventDefault();
-        } else if(e.key === "Enter" && (number || !e.shiftKey)) {
+        if(e.key === "Enter" && (number || !e.shiftKey)) {
             // Allow new lines when pressing shift and not a number input
             e.preventDefault();
             onValueChange();
@@ -50,6 +49,13 @@
             e.preventDefault();
             tryCancel();
         }
+    }
+
+    function onInput() {
+        if(number) value = value.replace(numberRegex, "");
+        else value = value.replace(charsRegex, "");
+
+        updateHeight();
     }
     
     function tryCancel() {
@@ -59,14 +65,18 @@
     let textarea: HTMLTextAreaElement;
     function updateHeight() {
         textarea.style.height = "";
-        textarea.style.height = (textarea.scrollHeight) + "px";
+
+        let height = textarea.scrollHeight;
+        if(!number) height += 1;
+        textarea.style.height = height + "px";
     }
     onMount(updateHeight);
 </script>
 
 <svelte:window bind:innerWidth={windowWidth} />
 
-<textarea class="resize-none outline-none -mx-[3px] wrap-break-word h-8 overflow-hidden
+<textarea class="resize-none outline-none -mx-[3px] wrap-break-word h-8 overflow-y-auto
     {number ? "" : "border-b border-yellow-200 -my-px"}" use:autofocus spellcheck={false}
     style:width="{width}px" bind:value={value} {placeholder} bind:this={textarea} {maxlength}
-    onkeydown={onKeydown} oninput={updateHeight} onblur={tryCancel}></textarea>
+    style:max-height="calc(100vh - 132px)"
+    onkeydown={onKeydown} oninput={onInput} onblur={tryCancel}></textarea>

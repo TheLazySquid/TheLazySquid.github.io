@@ -38,10 +38,12 @@
 <svelte:window onkeydown={onKeydown} />
 
 <Modal class="bg-backdrop" bind:open={viewState.open}>
-    <div style="width: min(90%, 600px);"
-        class="h-[85%] bg-amber-100 rounded-4xl p-3 overflow-hidden markdown break-words">
-        <Markdown md={getPage(viewState.shelf.toString(), viewState.row, viewState.book, viewState.page)}
-            plugins={[{ renderer: { a: Link } }]}/>
+    <div style="width: min(90%, 600px);" class="h-[85%] bg-amber-100 rounded-4xl p-3">
+        <div class="markdown break-words overflow-auto h-full"
+            style="scrollbar-color: rgba(0, 0, 0, 0.5) transparent;">
+            <Markdown md={getPage(viewState.shelf.toString(), viewState.row, viewState.book, viewState.page)}
+                plugins={[{ renderer: { a: Link } }]}/>
+        </div>
     </div>
     <div class="text-white text-2xl select-none font-semibold flex items-center gap-5">
         <button disabled={viewState.page === 0} class:opacity-50={viewState.page === 0}
