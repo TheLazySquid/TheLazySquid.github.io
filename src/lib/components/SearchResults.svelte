@@ -31,6 +31,7 @@
         viewState.book = address.book;
         viewState.page = address.page;
         viewState.open = true;
+        viewState.save();
         open = false;
     }
 </script>

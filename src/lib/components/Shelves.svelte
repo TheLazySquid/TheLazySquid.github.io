@@ -74,6 +74,7 @@
         viewState.book = book.book;
         viewState.page = 0;
         viewState.open = true;
+        viewState.save();
     }
 </script>
 

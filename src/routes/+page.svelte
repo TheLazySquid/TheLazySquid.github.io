@@ -23,6 +23,7 @@
             if(valInt < 1n) valInt = 1n;
             viewState.shelf = valInt;
             viewState.open = false;
+            viewState.save();
         } catch {}
 
         editingShelf = false;
@@ -43,6 +44,12 @@
 
         query = value;
         resultsOpen = true;
+    }
+
+    function moveShelf(delta: bigint) {
+        viewState.shelf += delta;
+        viewState.open = false;
+        viewState.save();
     }
 </script>
 
@@ -86,7 +93,7 @@
 
 {#snippet button(className: string, Icon: typeof ChevronLeft, delta: bigint)}
     <button class="{className} fixed top-1/2 -translate-y-1/2 rounded-full flex justify-center items-center z-10"
-        style="background-color: rgba(255, 255, 255, 0.7)" onclick={() => viewState.shelf += delta}>
+        style="background-color: rgba(255, 255, 255, 0.7)" onclick={() => moveShelf(delta)}>
         <Icon size={32} />
     </button>
 {/snippet}

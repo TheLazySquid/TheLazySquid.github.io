@@ -23,7 +23,7 @@
     {open ? "": "pointer-events-none opacity-0"} transition-opacity {className}">
     {#if open}
         <div transition:fly={{ y: 20, duration: 150 }}
-            class="w-full h-full flex flex-col items-center justify-center">
+            class="w-full h-dvh flex flex-col items-center justify-center py-3">
             <div class="modal-content contents">
                 {@render children()}
             </div>
