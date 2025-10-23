@@ -6,14 +6,16 @@
         class?: string;
         open: boolean;
         children: Snippet;
+        onClose?: () => void;
     }
 
-    let { class: className = "", open = $bindable(), children }: Props = $props();
+    let { class: className = "", open = $bindable(), children, onClose }: Props = $props();
 
     function onClick(e: MouseEvent) {
-        if(!(e.target as HTMLElement).closest(".modal-content")) {
-            open = false;
-        }
+        if((e.target as HTMLElement).closest(".modal-content")) return;
+        
+        open = false;
+        onClose?.();
     }
 </script>
 
