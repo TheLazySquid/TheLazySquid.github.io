@@ -5,9 +5,12 @@
     import Markdown from "svelte-exmarkdown";
     import ChevronLeft from "@lucide/svelte/icons/chevron-left";
     import ChevronRight from "@lucide/svelte/icons/chevron-right";
+    import ClipboardCopy from "@lucide/svelte/icons/clipboard-copy";
     import { watch } from "runed";
     import Link from "./markdown/Link.svelte";
     import Modal from "./Modal.svelte";
+    import { fly } from "svelte/transition";
+    import toast from "svelte-french-toast";
 
     function onKeydown(e: KeyboardEvent) {
         if (e.key === "Escape") {
@@ -36,9 +39,32 @@
             viewState.save();
         }
     }
+
+    function copyUrl(e: MouseEvent) {
+        e.stopPropagation();
+
+        const params = new URLSearchParams();
+        params.set("shelf", viewState.shelf.toString());
+        params.set("row", viewState.row.toString());
+        params.set("book", viewState.book.toString());
+        params.set("page", viewState.page.toString());
+        params.set("open", viewState.open ? "true" : "false");
+
+        const url = `${location.origin}${location.pathname}?${params.toString()}`;
+        navigator.clipboard.writeText(url)
+            .then(() => toast.success("Copied url to clipboard"))
+            .catch(() => toast.error("Failed to copy url"));
+    }
 </script>
 
 <svelte:window onkeydown={onKeydown} />
+
+{#if viewState.open}
+    <button class="bg-backdrop fixed left-4 bottom-4 rounded-full p-3 text-yellow-200 z-50"
+        transition:fly={{ y: 20, duration: 150 }} onclick={copyUrl}>
+        <ClipboardCopy size={24} />
+    </button>
+{/if}
 
 <Modal class="bg-backdrop" bind:open={viewState.open} onClose={() => viewState.save()}>
     <div style="width: min(90%, 600px);" class="flex-grow min-h-0 bg-amber-100 rounded-4xl p-3 max-h-[800px]">
