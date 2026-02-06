@@ -3,6 +3,12 @@ export const booksPerRow = 47;
 export const pagesPerBook = 300;
 export const charsPerPage = 1350;
 
+// Max of 2^15 since they get turned into 16 bit unicode characters
+export const bitsPerCharacter = 15n;
+export const characterMask = (1n << bitsPerCharacter) - 1n;
+// We want to avoid stuff like control characters/spaces as much as possible
+export const characterOffset = 0x2070;
+
 // 99 characters total (so there's no issues with leading 00)
 export const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ  `1234567890-=[]\\;'./~!@#$%^&*()_+{}|:\"<>?\n,.?";
 export const charsRegex = /[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ `1234567890\-=\[\]\\;'\.\/~!@#\$%\^&\*\(\)_\+{}\|:"<>\?\n,\.\?]/g;

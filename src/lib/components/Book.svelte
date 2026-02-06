@@ -40,7 +40,9 @@
         }
     }
 
-    function copyUrl(e: MouseEvent) {
+    let copyDropdownOpen = $state(false);
+
+    function copyFullUrl(e: MouseEvent) {
         e.stopPropagation();
 
         const params = new URLSearchParams();
@@ -52,18 +54,45 @@
 
         const url = `${location.origin}${location.pathname}?${params.toString()}`;
         navigator.clipboard.writeText(url)
-            .then(() => toast.success("Copied url to clipboard"))
+            .then(() => toast.success("Copied full url to clipboard"))
             .catch(() => toast.error("Failed to copy url"));
+
+        copyDropdownOpen = false;
+    }
+
+    function copyCompressedUrl(e: MouseEvent) {
+        e.stopPropagation();
+
+        const url = `${location.origin}${location.pathname}?${viewState.getCompressed()}`;
+        navigator.clipboard.writeText(url)
+            .then(() => toast.success("Copied compressed url to clipboard"))
+            .catch(() => toast.error("Failed to copy url"));
+
+        copyDropdownOpen = false;
+    }
+
+    function openCopyDropdown(e: MouseEvent) {
+        e.stopPropagation();
+        copyDropdownOpen = !copyDropdownOpen;
     }
 </script>
 
-<svelte:window onkeydown={onKeydown} />
+<svelte:window onkeydown={onKeydown} onclick={() => copyDropdownOpen = false} />
 
 {#if viewState.open}
     <button class="bg-backdrop fixed left-4 bottom-4 rounded-full p-3 text-yellow-200 z-50"
-        transition:fly={{ y: 20, duration: 150 }} onclick={copyUrl}>
+        transition:fly={{ y: 20, duration: 150 }} onclick={openCopyDropdown}>
         <ClipboardCopy size={24} />
     </button>
+{/if}
+
+{#if copyDropdownOpen}
+    <!-- svelte-ignore a11y_click_events_have_key_events,a11y_no_static_element_interactions -->
+    <div class="absolute left-4 bottom-16 bg-backdrop p-2 rounded-md text-yellow-200 z-50 flex flex-col"
+        onclick={(e) => e.stopPropagation()}>
+        <button onclick={copyFullUrl}>Copy full URL</button>
+        <button onclick={copyCompressedUrl}>Copy Compressed URL</button>
+    </div>
 {/if}
 
 <Modal class="bg-backdrop" bind:open={viewState.open} onClose={() => viewState.save()}>
