@@ -88,10 +88,10 @@
 
 {#if copyDropdownOpen}
     <!-- svelte-ignore a11y_click_events_have_key_events,a11y_no_static_element_interactions -->
-    <div class="absolute left-4 bottom-16 bg-backdrop p-2 rounded-md text-yellow-200 z-50 flex flex-col"
+    <div class="absolute left-4 bottom-18 bg-backdrop p-2 rounded-md text-yellow-200 z-50 flex flex-col"
         onclick={(e) => e.stopPropagation()}>
         <button onclick={copyFullUrl}>Copy full URL</button>
-        <button onclick={copyCompressedUrl}>Copy Compressed URL</button>
+        <button onclick={copyCompressedUrl}>Copy compressed URL</button>
     </div>
 {/if}
 
