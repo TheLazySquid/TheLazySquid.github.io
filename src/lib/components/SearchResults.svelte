@@ -26,12 +26,7 @@
     }
 
     const jump = (address: Address) => {
-        viewState.shelf = BigInt(address.shelf);
-        viewState.row = address.row;
-        viewState.book = address.book;
-        viewState.page = address.page;
-        viewState.open = true;
-        viewState.save();
+        viewState.jumpToAddress(address);
         open = false;
     }
 </script>

@@ -13,7 +13,8 @@
 
     function onClick(e: MouseEvent) {
         if((e.target as HTMLElement).closest(".modal-content")) return;
-        
+        if(!(e.target as HTMLElement).closest(".modal-bg")) return;
+
         open = false;
         onClose?.();
     }
@@ -21,7 +22,7 @@
 
 <svelte:window onclick={onClick} />
 
-<div class="fixed top-0 left-0 w-screen h-screen z-20
+<div class="fixed top-0 left-0 w-screen h-screen z-20 modal-bg
     {open ? "": "pointer-events-none opacity-0"} transition-opacity {className}">
     {#if open}
         <div transition:fly={{ y: 20, duration: 150 }}

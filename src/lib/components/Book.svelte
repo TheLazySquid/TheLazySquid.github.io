@@ -42,9 +42,7 @@
 
     let copyDropdownOpen = $state(false);
 
-    function copyFullUrl(e: MouseEvent) {
-        e.stopPropagation();
-
+    function copyFullUrl() {
         const params = new URLSearchParams();
         params.set("shelf", viewState.shelf.toString());
         params.set("row", viewState.row.toString());
@@ -60,9 +58,7 @@
         copyDropdownOpen = false;
     }
 
-    function copyCompressedUrl(e: MouseEvent) {
-        e.stopPropagation();
-
+    function copyCompressedUrl() {
         const url = `${location.origin}${location.pathname}?${viewState.getCompressed()}`;
         navigator.clipboard.writeText(url)
             .then(() => toast.success("Copied compressed url to clipboard"))
@@ -90,8 +86,8 @@
     <!-- svelte-ignore a11y_click_events_have_key_events,a11y_no_static_element_interactions -->
     <div class="absolute left-4 bottom-18 bg-backdrop p-2 rounded-md text-yellow-200 z-50 flex flex-col"
         onclick={(e) => e.stopPropagation()}>
-        <button onclick={copyFullUrl}>Copy full URL</button>
-        <button onclick={copyCompressedUrl}>Copy compressed URL</button>
+        <button class="text-left" onclick={copyFullUrl}>Copy full URL</button>
+        <button class="text-left" onclick={copyCompressedUrl}>Copy compressed URL</button>
     </div>
 {/if}
 

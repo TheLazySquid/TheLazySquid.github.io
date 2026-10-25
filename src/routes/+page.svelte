@@ -11,6 +11,7 @@
     import { charsPerPage, charsRegex } from "$lib/consts";
     import toast from "svelte-french-toast";
     import Shelves from "$lib/components/Shelves.svelte";
+    import Bookmarks from "$lib/components/Bookmarks.svelte";
 
     let editingShelf = $state(false);
     let searching = $state(false);
@@ -88,6 +89,7 @@
     </div>
 </div>
 
+<Bookmarks />
 <Book />
 <SearchResults {query} bind:open={resultsOpen} />
 

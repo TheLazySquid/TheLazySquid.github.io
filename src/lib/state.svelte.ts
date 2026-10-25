@@ -1,6 +1,7 @@
 import { browser } from "$app/environment";
+import type { Address } from "./babel";
 import { bitsPerCharacter, booksPerRow, characterMask, characterOffset, pagesPerBook, rowsPerShelf } from "./consts";
-import { stringToCodes } from "./util";
+import { isBookOkay, isPageOkay, isRowOkay, stringToCodes } from "./util";
 
 interface State {
     shelf: bigint;
@@ -35,6 +36,15 @@ class ViewState {
             page: this.page,
             open: this.open
         }));
+    }
+
+    jumpToAddress(address: Address) {
+        this.shelf = BigInt(address.shelf);
+        this.row = address.row;
+        this.book = address.book;
+        this.page = address.page;
+        this.open = true;
+        this.save();
     }
 
     getCompressed() {
@@ -149,9 +159,9 @@ function readCompressedParams(search: string) {
 
 function checkState(state: State) {
     if(state.shelf < 1n) throw new Error("Invalid shelf number " + state.shelf);
-    if(state.row < 0 || state.row >= rowsPerShelf) throw new Error("Invalid row number " + state.row);
-    if(state.book < 0 || state.book >= booksPerRow) throw new Error("Invalid book number " + state.book);
-    if(state.page < 0 || state.page >= pagesPerBook) throw new Error("Invalid page number " + state.page);
+    if(!isRowOkay(state.row)) throw new Error("Invalid row number " + state.row);
+    if(!isBookOkay(state.book)) throw new Error("Invalid book number " + state.book);
+    if(!isPageOkay(state.page)) throw new Error("Invalid page number " + state.page);
 }
 
 export let viewState = new ViewState();

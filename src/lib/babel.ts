@@ -21,6 +21,10 @@ export interface Address {
     page: number;
 }
 
+export interface NamedAddress extends Address {
+    name: string;
+}
+
 export function searchStart(string: string, row?: number, book?: number, page?: number): Address {
     rng.setSeed(...stringToCodes(string));
     row ??= rng.random(rowsPerShelf);
