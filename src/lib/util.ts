@@ -1,6 +1,10 @@
 import type { NamedAddress } from "./babel";
 import { booksPerRow, pagesPerBook, rowsPerShelf } from "./consts";
 
+export function resetUrl() {
+    history.replaceState(null, "", "/");
+}
+
 export function mod(number: number, modulus: number) {
     return ((number % modulus) + modulus) % modulus;
 }

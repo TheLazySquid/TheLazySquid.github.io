@@ -1,9 +1,9 @@
 import { browser } from "$app/environment";
 import type { Address } from "./babel";
 import { bitsPerCharacter, booksPerRow, characterMask, characterOffset, pagesPerBook, rowsPerShelf } from "./consts";
-import { isBookOkay, isPageOkay, isRowOkay, stringToCodes } from "./util";
+import { isBookOkay, isPageOkay, isRowOkay, resetUrl, stringToCodes } from "./util";
 
-interface State {
+export interface State {
     shelf: bigint;
     row: number;
     book: number;
@@ -19,14 +19,21 @@ const defaults: State = {
     open: false
 }
 
-const initialState = loadSaved();
-
 class ViewState {
-    shelf = $state(initialState.shelf);
-    row = $state(initialState.row);
-    book = $state(initialState.book);
-    page = $state(initialState.page);
-    open = $state(initialState.open);
+    shelf = $state(defaults.shelf);
+    row = $state(defaults.row);
+    book = $state(defaults.book);
+    page = $state(defaults.page);
+    open = $state(defaults.open);
+
+    init(state: State) {
+        if(!state) return;
+        this.shelf = state.shelf;
+        this.row = state.row;
+        this.book = state.book;
+        this.page = state.page;
+        this.open = state.open;
+    }
 
     save() {
         localStorage.setItem("viewState", JSON.stringify({
@@ -66,7 +73,7 @@ class ViewState {
     }
 }
 
-function loadSaved(): State {
+export function loadSaved(): State {
     if(!browser) return defaults;
 
     const searched = decodeURIComponent(location.search);
@@ -114,8 +121,7 @@ function readUncompressedParams(search: string) {
 
         checkState(state);
 
-        // Clear the URL parameters after loading
-        history.replaceState(null, "", location.pathname);
+        resetUrl();
         return state;
     } catch(e) {
         console.warn("Failed to parse view state from URL parameters", e);
@@ -148,8 +154,7 @@ function readCompressedParams(search: string) {
 
         checkState(state);
 
-        // Clear the URL parameters after loading
-        history.replaceState(null, "", location.pathname);
+        resetUrl();
         return state;
     } catch(e) {
         console.warn("Failed to parse view state from compressed parameters", e);
