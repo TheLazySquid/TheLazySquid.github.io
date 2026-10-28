@@ -1,7 +1,6 @@
-import { browser } from "$app/environment";
 import type { Address } from "./babel";
-import { bitsPerCharacter, booksPerRow, characterMask, characterOffset, pagesPerBook, rowsPerShelf } from "./consts";
-import { isBookOkay, isPageOkay, isRowOkay, resetUrl, stringToCodes } from "./util";
+import { bitsPerCharacter, characterMask, characterOffset } from "./consts";
+import { isBookOkay, isPageOkay, isRowOkay, stringToCodes } from "./util";
 
 export interface State {
     shelf: bigint;
@@ -26,8 +25,11 @@ class ViewState {
     page = $state(defaults.page);
     open = $state(defaults.open);
 
-    init(state: State) {
+    init(state: State | null) {
+        state ??= loadStateFromStorage();
+        history.replaceState(null, "", "/");
         if(!state) return;
+
         this.shelf = state.shelf;
         this.row = state.row;
         this.book = state.book;
@@ -73,9 +75,7 @@ class ViewState {
     }
 }
 
-export function loadSaved(): State {
-    if(!browser) return defaults;
-
+export function loadStateFromSearch(): State | null {
     const searched = decodeURIComponent(location.search);
 
     if(searched.includes("=")) {
@@ -86,6 +86,10 @@ export function loadSaved(): State {
         if(compressed) return compressed;
     }
 
+    return null;
+}
+
+function loadStateFromStorage(): State | null {
     const saved = localStorage.getItem("viewState");
     if(!saved) return defaults;
 
@@ -97,7 +101,7 @@ export function loadSaved(): State {
         }
     } catch {
         console.error("Failed to parse saved view state");
-        return defaults;
+        return null;
     }
 }
 
@@ -121,7 +125,6 @@ function readUncompressedParams(search: string) {
 
         checkState(state);
 
-        resetUrl();
         return state;
     } catch(e) {
         console.warn("Failed to parse view state from URL parameters", e);
@@ -154,7 +157,6 @@ function readCompressedParams(search: string) {
 
         checkState(state);
 
-        resetUrl();
         return state;
     } catch(e) {
         console.warn("Failed to parse view state from compressed parameters", e);

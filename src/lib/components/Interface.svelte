@@ -3,7 +3,7 @@
     import ChevronLeft from "@lucide/svelte/icons/chevron-left";
     import Pencil from "@lucide/svelte/icons/pencil";
     import Search from "@lucide/svelte/icons/search";
-    import { viewState } from "$lib/state.svelte";
+    import { viewState, type State } from "$lib/state.svelte";
     import Book from "$lib/components/Book.svelte";
     import GrowingTextarea from "$lib/components/GrowingTextarea.svelte";
     import SearchResults from "$lib/components/SearchResults.svelte";
@@ -13,7 +13,7 @@
     import Shelves from "$lib/components/Shelves.svelte";
     import Bookmarks from "$lib/components/Bookmarks.svelte";
 
-    let { initialState } = $props();
+    let { initialState = null }: { initialState: State | null } = $props();
     viewState.init(initialState);
 
     let editingShelf = $state(false);
